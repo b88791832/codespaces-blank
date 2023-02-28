@@ -1,0 +1,44 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using DG.Tweening;
+using UnityEngine.SceneManagement;
+
+[CreateAssetMenu(menuName = "Singletons/Sound_Manager", fileName = "Sound_Manager")]
+public class Sound_Manager : ScriptableObject
+{
+    [field: SerializeField] public AudioSource _BGMSource { get; private set; }
+    [field: SerializeField] public AudioSource _seSource { get; private set; }
+
+    public void SetSeSource(AudioSource _source)
+    {
+        _seSource = _source;
+        _seSource.volume = Master_Manager.Save_Manager._seVolume;
+    }
+
+    public void SetBgmSource(AudioSource _source)
+    {
+        _BGMSource = _source;
+        _BGMSource.volume = Master_Manager.Save_Manager._bgmVolume;
+    }
+
+    public void PlaySE(AudioClip _clip)
+    {
+        _seSource.PlayOneShot(_clip);
+    }
+
+    public void PlayBGM(AudioClip _clip)
+    {
+        if (!_BGMSource.isPlaying || _BGMSource.clip != _clip)
+        {
+            _BGMSource.DOFade(0, 1f).SetUpdate(true).OnComplete(() =>
+            {
+                _BGMSource.Stop();
+                _BGMSource.clip = _clip;
+                _BGMSource.Play();
+                _BGMSource.DOFade(Master_Manager.Save_Manager._bgmVolume, 1).SetUpdate(true);
+            });
+        }
+    }
+
+}
